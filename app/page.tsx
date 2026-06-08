@@ -1,0 +1,448 @@
+"use client";
+
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+const NAVY = "#1f4e79";
+const DARK = "#1a1a2e";
+const SOFT_BG = "#f4f6f9";
+const WHITE = "#ffffff";
+const MUTED = "#6b7280";
+const BORDER = "#d1d5db";
+const TEXT = "#1a1a2e";
+const GREEN = "#2f6b3a";
+
+interface ActivityEntry {
+  id: number;
+  from: string;
+  to: string;
+  activity: string;
+}
+
+export default function DARForm() {
+  const today = new Date().toISOString().split("T")[0];
+
+  const [form, setForm] = useState({
+    officerName: "",
+    clientSite: "Washington University",
+    branch: "Saint Louis",
+    date: today,
+    scheduledShift: "",
+    receivedRadio: false,
+    receivedPager: false,
+    receivedKeys: false,
+    receivedDetex: false,
+    receivedOther: "",
+    shiftStart: "",
+    shiftStartPeriod: "AM",
+    shiftEnd: "",
+    shiftEndPeriod: "PM",
+    mealBreakOut: "",
+    mealBreakOutPeriod: "PM",
+    mealBreakIn: "",
+    mealBreakInPeriod: "PM",
+    restBreak1Out: "",
+    restBreak1In: "",
+    restBreak2Out: "",
+    restBreak2In: "",
+    onDutyMeal: false,
+    missedRestBreak: false,
+    missedMealPeriod: false,
+    missedExplanation: "",
+    signature: "",
+  });
+
+  const [entries, setEntries] = useState<ActivityEntry[]>([
+    { id: 1, from: "", to: "", activity: "" },
+  ]);
+
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const toggle = (field: string) => () =>
+    setForm((f) => ({ ...f, [field]: !f[field as keyof typeof f] }));
+
+  const addEntry = () =>
+    setEntries((e) => [...e, { id: Date.now(), from: "", to: "", activity: "" }]);
+
+  const removeEntry = (id: number) =>
+    setEntries((e) => e.filter((entry) => entry.id !== id));
+
+  const updateEntry = (id: number, field: string, value: string) =>
+    setEntries((e) => e.map((entry) => entry.id === id ? { ...entry, [field]: value } : entry));
+
+  const required = form.officerName && form.date && form.signature;
+
+  const handleSubmit = async () => {
+    if (!required) return;
+    setSubmitting(true);
+    setError("");
+
+    const { error: dbError } = await supabase.from("dar_submissions").insert([{
+      officer_name: form.officerName,
+      client_site: form.clientSite,
+      branch: form.branch,
+      date: form.date,
+      shift_start: `${form.shiftStart} ${form.shiftStartPeriod}`,
+      shift_end: `${form.shiftEnd} ${form.shiftEndPeriod}`,
+      meal_break_out: form.mealBreakOut ? `${form.mealBreakOut} ${form.mealBreakOutPeriod}` : null,
+      meal_break_in: form.mealBreakIn ? `${form.mealBreakIn} ${form.mealBreakInPeriod}` : null,
+      rest_break_1_out: form.restBreak1Out || null,
+      rest_break_1_in: form.restBreak1In || null,
+      rest_break_2_out: form.restBreak2Out || null,
+      rest_break_2_in: form.restBreak2In || null,
+      on_duty_meal: form.onDutyMeal,
+      received_radio: form.receivedRadio,
+      received_pager: form.receivedPager,
+      received_keys: form.receivedKeys,
+      received_detex: form.receivedDetex,
+      received_other: form.receivedOther || null,
+      activity_log: entries.filter((e) => e.activity.trim()),
+      missed_rest_break: form.missedRestBreak,
+      missed_meal_period: form.missedMealPeriod,
+      missed_explanation: form.missedExplanation || null,
+      signature: form.signature,
+    }]);
+
+    if (dbError) {
+      setError("Submission failed. Please try again.");
+      setSubmitting(false);
+      return;
+    }
+
+    setSubmitted(true);
+    setSubmitting(false);
+  };
+
+  const handleReset = () => {
+    setForm({
+      officerName: "",
+      clientSite: "Washington University",
+      branch: "Saint Louis",
+      date: today,
+      scheduledShift: "",
+      receivedRadio: false,
+      receivedPager: false,
+      receivedKeys: false,
+      receivedDetex: false,
+      receivedOther: "",
+      shiftStart: "",
+      shiftStartPeriod: "AM",
+      shiftEnd: "",
+      shiftEndPeriod: "PM",
+      mealBreakOut: "",
+      mealBreakOutPeriod: "PM",
+      mealBreakIn: "",
+      mealBreakInPeriod: "PM",
+      restBreak1Out: "",
+      restBreak1In: "",
+      restBreak2Out: "",
+      restBreak2In: "",
+      onDutyMeal: false,
+      missedRestBreak: false,
+      missedMealPeriod: false,
+      missedExplanation: "",
+      signature: "",
+    });
+    setEntries([{ id: 1, from: "", to: "", activity: "" }]);
+    setSubmitted(false);
+    setError("");
+  };
+
+  if (submitted) {
+    return (
+      <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
+        <div style={{ maxWidth: 480, width: "100%", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden", textAlign: "center" }}>
+          <div style={{ background: NAVY, padding: "1.25rem 2rem" }}>
+            <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300 }}>™</sup>
+            </div>
+            <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.68rem", marginTop: 2 }}>There for you.</div>
+          </div>
+          <div style={{ padding: "2.5rem 2rem" }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#e8f5e9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2f6b3a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div style={{ fontSize: "1.1rem", fontWeight: 700, color: TEXT, marginBottom: 8 }}>DAR Submitted</div>
+            <div style={{ color: MUTED, fontSize: "0.85rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
+              Your Daily Activity Report for {new Date(form.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} has been recorded.
+            </div>
+            <button onClick={handleReset} style={btnStyle(NAVY)}>Submit Another DAR</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden" }}>
+
+        {/* Header */}
+        <div style={{ background: NAVY, padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300, marginLeft: 1 }}>™</sup>
+            </div>
+            <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.68rem", marginTop: 2 }}>Security Services</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ color: WHITE, fontSize: "0.95rem", fontWeight: 700 }}>Daily Activity Report</div>
+            <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem" }}>Complete all sections for each day worked</div>
+          </div>
+        </div>
+
+        <div style={{ padding: "0 0 2rem" }}>
+
+          {/* Section I */}
+          <SectionBar label="Section I: Employee Information" />
+          <div style={{ padding: "1.25rem 2rem 0" }}>
+            <Field label="Officer on Duty" value={form.officerName} onChange={set("officerName")} required placeholder="Full legal name" />
+            <Row>
+              <Field label="Client / Site" value={form.clientSite} onChange={set("clientSite")} />
+              <Field label="Today's Date" value={form.date} onChange={set("date")} type="date" required />
+            </Row>
+            <Row>
+              <Field label="Branch" value={form.branch} onChange={set("branch")} />
+              <Field label="Scheduled Shift" value={form.scheduledShift} onChange={set("scheduledShift")} placeholder="e.g. Greenway Walk" />
+            </Row>
+
+            <Label>Received Items</Label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem 1.5rem", margin: "0.5rem 0 0.5rem" }}>
+              {[
+                ["receivedRadio", "Radio"],
+                ["receivedPager", "Pager"],
+                ["receivedKeys", "Keys"],
+                ["receivedDetex", "Detex"],
+              ].map(([field, label]) => (
+                <CheckboxItem key={field} label={label} checked={form[field as keyof typeof form] as boolean} onChange={toggle(field)} />
+              ))}
+            </div>
+            <Field label="Other Received Items" value={form.receivedOther} onChange={set("receivedOther")} placeholder="Specify if applicable" />
+          </div>
+
+          {/* Section II */}
+          <SectionBar label="Section II: Record of Hours Worked and Breaks" />
+          <div style={{ padding: "1.25rem 2rem 0" }}>
+            <Row>
+              <TimeField label="Time In (shift start)" value={form.shiftStart} onChange={set("shiftStart")} period={form.shiftStartPeriod} onPeriodChange={set("shiftStartPeriod")} />
+              <TimeField label="Time Out (shift end)" value={form.shiftEnd} onChange={set("shiftEnd")} period={form.shiftEndPeriod} onPeriodChange={set("shiftEndPeriod")} />
+            </Row>
+            <Row>
+              <TimeField label="Time Out (meal break)" value={form.mealBreakOut} onChange={set("mealBreakOut")} period={form.mealBreakOutPeriod} onPeriodChange={set("mealBreakOutPeriod")} />
+              <TimeField label="Time In (meal break)" value={form.mealBreakIn} onChange={set("mealBreakIn")} period={form.mealBreakInPeriod} onPeriodChange={set("mealBreakInPeriod")} />
+            </Row>
+
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <Label>Rest Break 1</Label>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <input value={form.restBreak1Out} onChange={set("restBreak1Out")} placeholder="Out" style={{ ...inputStyle, flex: 1 }} />
+                  <input value={form.restBreak1In} onChange={set("restBreak1In")} placeholder="In" style={{ ...inputStyle, flex: 1 }} />
+                </div>
+              </div>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <Label>Rest Break 2</Label>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <input value={form.restBreak2Out} onChange={set("restBreak2Out")} placeholder="Out" style={{ ...inputStyle, flex: 1 }} />
+                  <input value={form.restBreak2In} onChange={set("restBreak2In")} placeholder="In" style={{ ...inputStyle, flex: 1 }} />
+                </div>
+              </div>
+            </div>
+
+            <CheckboxItem label='Check here if your post has an "On-Duty" paid meal period' checked={form.onDutyMeal} onChange={toggle("onDutyMeal")} />
+          </div>
+
+          {/* Section III */}
+          <SectionBar label="Section III: Activity Details" />
+          <div style={{ padding: "1.25rem 2rem 0" }}>
+            <div style={{ fontSize: "0.75rem", color: MUTED, marginBottom: "1rem", lineHeight: 1.5 }}>
+              Record all activity below. Mark an asterisk (*) next to any security incident. Attach all Incident Reports and supporting documents.
+            </div>
+
+            {entries.map((entry, index) => (
+              <div key={entry.id} style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "0.75rem 1rem", marginBottom: "0.75rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span style={{ fontSize: "0.72rem", fontWeight: 700, color: NAVY, textTransform: "uppercase", letterSpacing: "0.05em" }}>Entry {index + 1}</span>
+                  {entries.length > 1 && (
+                    <button onClick={() => removeEntry(entry.id)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: "0.75rem", padding: "2px 6px" }}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                  <div style={{ width: 100 }}>
+                    <Label>From</Label>
+                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder="00:00" style={inputStyle} />
+                  </div>
+                  <div style={{ width: 100 }}>
+                    <Label>To</Label>
+                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder="00:00" style={inputStyle} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Label>Activity</Label>
+                    <input value={entry.activity} onChange={(e) => updateEntry(entry.id, "activity", e.target.value)} placeholder="Describe activity or incident" style={inputStyle} />
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <button onClick={addEntry} style={{ background: "none", border: `1.5px dashed ${NAVY}`, borderRadius: 4, color: NAVY, padding: "0.6rem 1rem", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: "0.5rem", fontFamily: "inherit" }}>
+              + Add Entry
+            </button>
+          </div>
+
+          {/* Section IV */}
+          <SectionBar label="Section IV: Employee Signature" />
+          <div style={{ padding: "1.25rem 2rem 0" }}>
+            <div style={{ fontSize: "0.78rem", color: TEXT, lineHeight: 1.65, marginBottom: "1rem", background: SOFT_BG, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${NAVY}`, borderRadius: 3, padding: "0.75rem 1rem" }}>
+              By your signature, you acknowledge that the information on this DAR is a true and accurate record of your time and account activity today.
+            </div>
+
+            <div style={{ marginBottom: "1rem" }}>
+              <Label>I did not receive my:</Label>
+              <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.4rem", flexWrap: "wrap" }}>
+                <CheckboxItem label="Rest Break" checked={form.missedRestBreak} onChange={toggle("missedRestBreak")} />
+                <CheckboxItem label="Meal Period Today" checked={form.missedMealPeriod} onChange={toggle("missedMealPeriod")} />
+              </div>
+            </div>
+
+            {(form.missedRestBreak || form.missedMealPeriod) && (
+              <div style={{ marginBottom: "1rem" }}>
+                <Label>Explain:</Label>
+                <textarea value={form.missedExplanation} onChange={set("missedExplanation")} placeholder="Provide explanation..." rows={3} style={{ ...inputStyle, resize: "vertical" as const }} />
+              </div>
+            )}
+
+            <Field label="Signature (type full name)" value={form.signature} onChange={set("signature")} placeholder="Full legal name" required />
+
+            {error && (
+              <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginBottom: "1rem" }}>
+                {error}
+              </div>
+            )}
+
+            <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <button
+                onClick={handleSubmit}
+                disabled={!required || submitting}
+                style={{ ...btnStyle(required && !submitting ? GREEN : "#9ca3af"), cursor: required && !submitting ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              >
+                {submitting ? "Submitting..." : "Submit DAR"}
+              </button>
+              {!required && (
+                <div style={{ fontSize: "0.75rem", color: MUTED, textAlign: "center" }}>
+                  Officer name, date, and signature are required
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: "2rem", padding: "0.85rem 2rem 0", fontSize: "0.72rem", color: MUTED, textAlign: "center" }}>
+            Allied Universal Security Services &nbsp;·&nbsp; Washington University &nbsp;·&nbsp; Please keep all completed forms on file for audit purposes.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SectionBar({ label }: { label: string }) {
+  return (
+    <div style={{ background: DARK, padding: "0.55rem 2rem", color: WHITE, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: "1.5rem" }}>
+      {label}
+    </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, placeholder, type = "text", required: req }: {
+  label: string; value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string; type?: string; required?: boolean;
+}) {
+  return (
+    <div style={{ marginBottom: "1rem" }}>
+      <Label>{label}{req && <span style={{ color: "#b3261e", marginLeft: 2 }}>*</span>}</Label>
+      <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={inputStyle} />
+    </div>
+  );
+}
+
+function TimeField({ label, value, onChange, period, onPeriodChange }: {
+  label: string; value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  period: string;
+  onPeriodChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+}) {
+  return (
+    <div style={{ marginBottom: "1rem", flex: 1 }}>
+      <Label>{label}</Label>
+      <div style={{ display: "flex", gap: "0.5rem" }}>
+        <input type="time" value={value} onChange={onChange} style={{ ...inputStyle, flex: 1 }} />
+        <select value={period} onChange={onPeriodChange} style={{ ...inputStyle, width: 70 }}>
+          <option>AM</option>
+          <option>PM</option>
+        </select>
+      </div>
+    </div>
+  );
+}
+
+function Row({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", gap: "1rem" }}>
+      {Array.isArray(children)
+        ? children.map((child, i) => <div key={i} style={{ flex: 1 }}>{child}</div>)
+        : <div style={{ flex: 1 }}>{children}</div>}
+    </div>
+  );
+}
+
+function CheckboxItem({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+  return (
+    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem", color: TEXT, fontWeight: checked ? 600 : 400, userSelect: "none", marginBottom: "0.5rem" }}>
+      <div onClick={onChange} style={{ width: 16, height: 16, border: `2px solid ${checked ? NAVY : BORDER}`, borderRadius: 2, background: checked ? NAVY : WHITE, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer", transition: "all 0.15s" }}>
+        {checked && (
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </div>
+      <span onClick={onChange}>{label}</span>
+    </label>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%", boxSizing: "border-box", padding: "0.5rem 0.75rem",
+  border: `1px solid #d1d5db`, borderRadius: 4, fontSize: "0.88rem",
+  color: TEXT, background: "#fafbfc", outline: "none", fontFamily: "inherit",
+};
+
+function btnStyle(bg: string): React.CSSProperties {
+  return {
+    background: bg, color: WHITE, border: "none", borderRadius: 4,
+    padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700,
+    letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit",
+    textTransform: "uppercase", width: "100%",
+  };
+}
