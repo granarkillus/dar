@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const getSupabase = () =>
+  createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
 const NAVY = "#1f4e79";
 const DARK = "#1a1a2e";
@@ -59,11 +60,23 @@ export default function DARForm() {
 
   const [entries, setEntries] = useState<ActivityEntry[]>([
     { id: 1, from: "", to: "", activity: "" },
+    { id: 2, from: "", to: "", activity: "" },
+    { id: 3, from: "", to: "", activity: "" },
+    { id: 4, from: "", to: "", activity: "" },
   ]);
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Pre-fill name from URL param (set by officer portal)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    if (name) {
+      setForm((f) => ({ ...f, officerName: decodeURIComponent(name) }));
+    }
+  }, []);
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -87,6 +100,7 @@ export default function DARForm() {
     setSubmitting(true);
     setError("");
 
+    const supabase = getSupabase();
     const { error: dbError } = await supabase.from("dar_submissions").insert([{
       officer_name: form.officerName,
       client_site: form.clientSite,
@@ -153,7 +167,12 @@ export default function DARForm() {
       missedExplanation: "",
       signature: "",
     });
-    setEntries([{ id: 1, from: "", to: "", activity: "" }]);
+    setEntries([
+      { id: 1, from: "", to: "", activity: "" },
+      { id: 2, from: "", to: "", activity: "" },
+      { id: 3, from: "", to: "", activity: "" },
+      { id: 4, from: "", to: "", activity: "" },
+    ]);
     setSubmitted(false);
     setError("");
   };
@@ -189,7 +208,6 @@ export default function DARForm() {
     <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
       <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden" }}>
 
-        {/* Header */}
         <div style={{ background: NAVY, padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
@@ -205,7 +223,6 @@ export default function DARForm() {
 
         <div style={{ padding: "0 0 2rem" }}>
 
-          {/* Section I */}
           <SectionBar label="Section I: Employee Information" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <Field label="Officer on Duty" value={form.officerName} onChange={set("officerName")} required placeholder="Full legal name" />
@@ -217,22 +234,15 @@ export default function DARForm() {
               <Field label="Branch" value={form.branch} onChange={set("branch")} />
               <Field label="Scheduled Shift" value={form.scheduledShift} onChange={set("scheduledShift")} placeholder="e.g. Greenway Walk" />
             </Row>
-
             <Label>Received Items</Label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem 1.5rem", margin: "0.5rem 0 0.5rem" }}>
-              {[
-                ["receivedRadio", "Radio"],
-                ["receivedPager", "Pager"],
-                ["receivedKeys", "Keys"],
-                ["receivedDetex", "Detex"],
-              ].map(([field, label]) => (
+              {[["receivedRadio", "Radio"], ["receivedPager", "Pager"], ["receivedKeys", "Keys"], ["receivedDetex", "Detex"]].map(([field, label]) => (
                 <CheckboxItem key={field} label={label} checked={form[field as keyof typeof form] as boolean} onChange={toggle(field)} />
               ))}
             </div>
             <Field label="Other Received Items" value={form.receivedOther} onChange={set("receivedOther")} placeholder="Specify if applicable" />
           </div>
 
-          {/* Section II */}
           <SectionBar label="Section II: Record of Hours Worked and Breaks" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <Row>
@@ -243,7 +253,6 @@ export default function DARForm() {
               <TimeField label="Time Out (meal break)" value={form.mealBreakOut} onChange={set("mealBreakOut")} period={form.mealBreakOutPeriod} onPeriodChange={set("mealBreakOutPeriod")} />
               <TimeField label="Time In (meal break)" value={form.mealBreakIn} onChange={set("mealBreakIn")} period={form.mealBreakInPeriod} onPeriodChange={set("mealBreakInPeriod")} />
             </Row>
-
             <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <Label>Rest Break 1</Label>
@@ -260,11 +269,9 @@ export default function DARForm() {
                 </div>
               </div>
             </div>
-
             <CheckboxItem label='Check here if your post has an "On-Duty" paid meal period' checked={form.onDutyMeal} onChange={toggle("onDutyMeal")} />
           </div>
 
-          {/* Section III */}
           <SectionBar label="Section III: Activity Details" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <div style={{ fontSize: "0.75rem", color: MUTED, marginBottom: "1rem", lineHeight: 1.5 }}>
@@ -303,13 +310,11 @@ export default function DARForm() {
             </button>
           </div>
 
-          {/* Section IV */}
           <SectionBar label="Section IV: Employee Signature" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <div style={{ fontSize: "0.78rem", color: TEXT, lineHeight: 1.65, marginBottom: "1rem", background: SOFT_BG, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${NAVY}`, borderRadius: 3, padding: "0.75rem 1rem" }}>
               By your signature, you acknowledge that the information on this DAR is a true and accurate record of your time and account activity today.
             </div>
-
             <div style={{ marginBottom: "1rem" }}>
               <Label>I did not receive my:</Label>
               <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.4rem", flexWrap: "wrap" }}>
@@ -317,22 +322,18 @@ export default function DARForm() {
                 <CheckboxItem label="Meal Period Today" checked={form.missedMealPeriod} onChange={toggle("missedMealPeriod")} />
               </div>
             </div>
-
             {(form.missedRestBreak || form.missedMealPeriod) && (
               <div style={{ marginBottom: "1rem" }}>
                 <Label>Explain:</Label>
                 <textarea value={form.missedExplanation} onChange={set("missedExplanation")} placeholder="Provide explanation..." rows={3} style={{ ...inputStyle, resize: "vertical" as const }} />
               </div>
             )}
-
             <Field label="Signature (type full name)" value={form.signature} onChange={set("signature")} placeholder="Full legal name" required />
-
             {error && (
               <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginBottom: "1rem" }}>
                 {error}
               </div>
             )}
-
             <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               <button
                 onClick={handleSubmit}
@@ -341,11 +342,7 @@ export default function DARForm() {
               >
                 {submitting ? "Submitting..." : "Submit DAR"}
               </button>
-              {!required && (
-                <div style={{ fontSize: "0.75rem", color: MUTED, textAlign: "center" }}>
-                  Officer name, date, and signature are required
-                </div>
-              )}
+              {!required && <div style={{ fontSize: "0.75rem", color: MUTED, textAlign: "center" }}>Officer name, date, and signature are required</div>}
             </div>
           </div>
 
