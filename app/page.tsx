@@ -232,7 +232,7 @@ export default function DARForm() {
             </Row>
             <Row>
               <Field label="Branch" value={form.branch} onChange={set("branch")} />
-              <Field label="Scheduled Shift" value={form.scheduledShift} onChange={set("scheduledShift")} placeholder="e.g. Greenway Walk" />
+              <Field label="Scheduled Shift / Post" value={form.scheduledShift} onChange={set("scheduledShift")} placeholder="e.g. Greenway Walk, Ackert, North Campus" />
             </Row>
             <Label>Received Items</Label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem 1.5rem", margin: "0.5rem 0 0.5rem" }}>
