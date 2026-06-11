@@ -124,7 +124,7 @@ export default function DARForm() {
       missed_rest_break: form.missedRestBreak,
       missed_meal_period: form.missedMealPeriod,
       missed_explanation: form.missedExplanation || null,
-      signature: form.signature,
+      scheduled_shift: form.scheduledShift || null,
     }]);
 
     if (dbError) {
