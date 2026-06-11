@@ -69,7 +69,6 @@ export default function DARForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Pre-fill name from URL param (set by officer portal)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name");
@@ -106,6 +105,7 @@ export default function DARForm() {
       client_site: form.clientSite,
       branch: form.branch,
       date: form.date,
+      scheduled_shift: form.scheduledShift || null,
       shift_start: `${form.shiftStart} ${form.shiftStartPeriod}`,
       shift_end: `${form.shiftEnd} ${form.shiftEndPeriod}`,
       meal_break_out: form.mealBreakOut ? `${form.mealBreakOut} ${form.mealBreakOutPeriod}` : null,
@@ -124,7 +124,7 @@ export default function DARForm() {
       missed_rest_break: form.missedRestBreak,
       missed_meal_period: form.missedMealPeriod,
       missed_explanation: form.missedExplanation || null,
-      scheduled_shift: form.scheduledShift || null,
+      signature: form.signature,
     }]);
 
     if (dbError) {
