@@ -197,7 +197,10 @@ export default function DARForm() {
             <div style={{ color: MUTED, fontSize: "0.85rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
               Your Daily Activity Report for {new Date(form.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} has been recorded.
             </div>
-            <button onClick={handleReset} style={btnStyle(NAVY)}>Submit Another DAR</button>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+              <button onClick={handleReset} style={btnStyle(NAVY)}>Submit Another DAR</button>
+              <a href="https://portal.xing.wtf" style={btnOutlineStyle(NAVY)}>Go to Officer Portal</a>
+            </div>
           </div>
         </div>
       </div>
@@ -215,9 +218,15 @@ export default function DARForm() {
             </div>
             <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.68rem", marginTop: 2 }}>Security Services</div>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: WHITE, fontSize: "0.95rem", fontWeight: 700 }}>Daily Activity Report</div>
-            <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem" }}>Complete all sections for each day worked</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+            <a href="https://portal.xing.wtf" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Officer Portal
+            </a>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ color: WHITE, fontSize: "0.95rem", fontWeight: 700 }}>Daily Activity Report</div>
+              <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem" }}>Complete all sections for each day worked</div>
+            </div>
           </div>
         </div>
 
@@ -441,5 +450,15 @@ function btnStyle(bg: string): React.CSSProperties {
     padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700,
     letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit",
     textTransform: "uppercase", width: "100%",
+  };
+}
+
+function btnOutlineStyle(color: string): React.CSSProperties {
+  return {
+    background: "none", color: color, border: `1.5px solid ${color}`, borderRadius: 4,
+    padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700,
+    letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit",
+    textTransform: "uppercase", width: "100%", textAlign: "center" as const,
+    textDecoration: "none", display: "block", boxSizing: "border-box",
   };
 }
