@@ -38,7 +38,6 @@ export default function DARForm() {
     receivedPager: false,
     receivedKeys: false,
     receivedDetex: false,
-    receivedOther: "",
     shiftStart: "",
     shiftEnd: "",
     signature: "",
@@ -98,7 +97,6 @@ export default function DARForm() {
       received_pager: form.receivedPager,
       received_keys: form.receivedKeys,
       received_detex: form.receivedDetex,
-      received_other: form.receivedOther || null,
       activity_log: entries.filter((e) => e.activity.trim()),
       signature: form.signature,
     }]);
@@ -124,7 +122,6 @@ export default function DARForm() {
       receivedPager: false,
       receivedKeys: false,
       receivedDetex: false,
-      receivedOther: "",
       shiftStart: "",
       shiftEnd: "",
       signature: "",
@@ -211,7 +208,6 @@ export default function DARForm() {
                 <CheckboxItem key={field} label={label} checked={form[field as keyof typeof form] as boolean} onChange={toggle(field)} />
               ))}
             </div>
-            <Field label="Other Received Items" value={form.receivedOther} onChange={set("receivedOther")} placeholder="Specify if applicable" />
           </div>
 
           <SectionBar label="Section II: Record of Hours Worked" />
@@ -245,7 +241,7 @@ export default function DARForm() {
                   </div>
                   <div style={{ width: 100 }}>
                     <Label>To</Label>
-                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder="1830" style={inputStyle} />
+                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder="2000" style={inputStyle} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <Label>Activity</Label>
