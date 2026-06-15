@@ -237,11 +237,11 @@ export default function DARForm() {
                 <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
                   <div style={{ width: 100 }}>
                     <Label>From</Label>
-                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder="1800" style={inputStyle} />
+                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder={activityTimePlaceholder(index).from} style={inputStyle} />
                   </div>
                   <div style={{ width: 100 }}>
                     <Label>To</Label>
-                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder="2000" style={inputStyle} />
+                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder={activityTimePlaceholder(index).to} style={inputStyle} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <Label>Activity</Label>
@@ -302,6 +302,19 @@ function Label({ children }: { children: React.ReactNode }) {
       {children}
     </div>
   );
+}
+
+// Generates "1800 to 2000, then 2000 to 2200, then 2200 to 2400, then 0000 to
+// 0200, ..." so each activity row's placeholder shows the next two-hour
+// block of the shift, modeling the expected flow of entries.
+function activityTimePlaceholder(index: number): { from: string; to: string } {
+  const startHour = (18 + index * 2) % 24;
+  const endHour = startHour + 2;
+  const fmt = (h: number) => String(h % 24).padStart(2, "0") + "00";
+  return {
+    from: fmt(startHour),
+    to: endHour === 24 ? "2400" : fmt(endHour),
+  };
 }
 
 function Field({ label, value, onChange, placeholder, type = "text", required: req }: {
