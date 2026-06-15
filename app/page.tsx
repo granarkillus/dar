@@ -40,13 +40,9 @@ export default function DARForm() {
     receivedDetex: false,
     receivedOther: "",
     shiftStart: "",
-    shiftStartPeriod: "AM",
     shiftEnd: "",
-    shiftEndPeriod: "PM",
     mealBreakOut: "",
-    mealBreakOutPeriod: "PM",
     mealBreakIn: "",
-    mealBreakInPeriod: "PM",
     restBreak1Out: "",
     restBreak1In: "",
     restBreak2Out: "",
@@ -106,10 +102,10 @@ export default function DARForm() {
       branch: form.branch,
       date: form.date,
       scheduled_shift: form.scheduledShift || null,
-      shift_start: `${form.shiftStart} ${form.shiftStartPeriod}`,
-      shift_end: `${form.shiftEnd} ${form.shiftEndPeriod}`,
-      meal_break_out: form.mealBreakOut ? `${form.mealBreakOut} ${form.mealBreakOutPeriod}` : null,
-      meal_break_in: form.mealBreakIn ? `${form.mealBreakIn} ${form.mealBreakInPeriod}` : null,
+      shift_start: form.shiftStart || null,
+      shift_end: form.shiftEnd || null,
+      meal_break_out: form.mealBreakOut || null,
+      meal_break_in: form.mealBreakIn || null,
       rest_break_1_out: form.restBreak1Out || null,
       rest_break_1_in: form.restBreak1In || null,
       rest_break_2_out: form.restBreak2Out || null,
@@ -150,13 +146,9 @@ export default function DARForm() {
       receivedDetex: false,
       receivedOther: "",
       shiftStart: "",
-      shiftStartPeriod: "AM",
       shiftEnd: "",
-      shiftEndPeriod: "PM",
       mealBreakOut: "",
-      mealBreakOutPeriod: "PM",
       mealBreakIn: "",
-      mealBreakInPeriod: "PM",
       restBreak1Out: "",
       restBreak1In: "",
       restBreak2Out: "",
@@ -255,26 +247,26 @@ export default function DARForm() {
           <SectionBar label="Section II: Record of Hours Worked and Breaks" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <Row>
-              <TimeField label="Time In (shift start)" value={form.shiftStart} onChange={set("shiftStart")} period={form.shiftStartPeriod} onPeriodChange={set("shiftStartPeriod")} />
-              <TimeField label="Time Out (shift end)" value={form.shiftEnd} onChange={set("shiftEnd")} period={form.shiftEndPeriod} onPeriodChange={set("shiftEndPeriod")} />
+              <Field label="Time In (shift start)" value={form.shiftStart} onChange={set("shiftStart")} placeholder="e.g. 6:00 PM or 1800" />
+              <Field label="Time Out (shift end)" value={form.shiftEnd} onChange={set("shiftEnd")} placeholder="e.g. 2:00 AM or 0200" />
             </Row>
             <Row>
-              <TimeField label="Time Out (meal break)" value={form.mealBreakOut} onChange={set("mealBreakOut")} period={form.mealBreakOutPeriod} onPeriodChange={set("mealBreakOutPeriod")} />
-              <TimeField label="Time In (meal break)" value={form.mealBreakIn} onChange={set("mealBreakIn")} period={form.mealBreakInPeriod} onPeriodChange={set("mealBreakInPeriod")} />
+              <Field label="Time Out (meal break)" value={form.mealBreakOut} onChange={set("mealBreakOut")} placeholder="e.g. 10:00 PM or 2200" />
+              <Field label="Time In (meal break)" value={form.mealBreakIn} onChange={set("mealBreakIn")} placeholder="e.g. 10:30 PM or 2230" />
             </Row>
             <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <Label>Rest Break 1</Label>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <input value={form.restBreak1Out} onChange={set("restBreak1Out")} placeholder="Out" style={{ ...inputStyle, flex: 1 }} />
-                  <input value={form.restBreak1In} onChange={set("restBreak1In")} placeholder="In" style={{ ...inputStyle, flex: 1 }} />
+                  <input value={form.restBreak1Out} onChange={set("restBreak1Out")} placeholder="Out (e.g. 8:00 PM)" style={{ ...inputStyle, flex: 1 }} />
+                  <input value={form.restBreak1In} onChange={set("restBreak1In")} placeholder="In (e.g. 8:15 PM)" style={{ ...inputStyle, flex: 1 }} />
                 </div>
               </div>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <Label>Rest Break 2</Label>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <input value={form.restBreak2Out} onChange={set("restBreak2Out")} placeholder="Out" style={{ ...inputStyle, flex: 1 }} />
-                  <input value={form.restBreak2In} onChange={set("restBreak2In")} placeholder="In" style={{ ...inputStyle, flex: 1 }} />
+                  <input value={form.restBreak2Out} onChange={set("restBreak2Out")} placeholder="Out (e.g. 11:30 PM)" style={{ ...inputStyle, flex: 1 }} />
+                  <input value={form.restBreak2In} onChange={set("restBreak2In")} placeholder="In (e.g. 11:45 PM)" style={{ ...inputStyle, flex: 1 }} />
                 </div>
               </div>
             </div>
@@ -300,11 +292,11 @@ export default function DARForm() {
                 <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
                   <div style={{ width: 100 }}>
                     <Label>From</Label>
-                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder="00:00" style={inputStyle} />
+                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder="6:00 PM" style={inputStyle} />
                   </div>
                   <div style={{ width: 100 }}>
                     <Label>To</Label>
-                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder="00:00" style={inputStyle} />
+                    <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder="1830" style={inputStyle} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <Label>Activity</Label>
@@ -389,26 +381,6 @@ function Field({ label, value, onChange, placeholder, type = "text", required: r
     <div style={{ marginBottom: "1rem" }}>
       <Label>{label}{req && <span style={{ color: "#b3261e", marginLeft: 2 }}>*</span>}</Label>
       <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={inputStyle} />
-    </div>
-  );
-}
-
-function TimeField({ label, value, onChange, period, onPeriodChange }: {
-  label: string; value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  period: string;
-  onPeriodChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-}) {
-  return (
-    <div style={{ marginBottom: "1rem", flex: 1 }}>
-      <Label>{label}</Label>
-      <div style={{ display: "flex", gap: "0.5rem" }}>
-        <input type="time" value={value} onChange={onChange} style={{ ...inputStyle, flex: 1 }} />
-        <select value={period} onChange={onPeriodChange} style={{ ...inputStyle, width: 70 }}>
-          <option>AM</option>
-          <option>PM</option>
-        </select>
-      </div>
     </div>
   );
 }
