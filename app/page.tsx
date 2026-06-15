@@ -41,16 +41,6 @@ export default function DARForm() {
     receivedOther: "",
     shiftStart: "",
     shiftEnd: "",
-    mealBreakOut: "",
-    mealBreakIn: "",
-    restBreak1Out: "",
-    restBreak1In: "",
-    restBreak2Out: "",
-    restBreak2In: "",
-    onDutyMeal: false,
-    missedRestBreak: false,
-    missedMealPeriod: false,
-    missedExplanation: "",
     signature: "",
   });
 
@@ -104,22 +94,12 @@ export default function DARForm() {
       scheduled_shift: form.scheduledShift || null,
       shift_start: form.shiftStart || null,
       shift_end: form.shiftEnd || null,
-      meal_break_out: form.mealBreakOut || null,
-      meal_break_in: form.mealBreakIn || null,
-      rest_break_1_out: form.restBreak1Out || null,
-      rest_break_1_in: form.restBreak1In || null,
-      rest_break_2_out: form.restBreak2Out || null,
-      rest_break_2_in: form.restBreak2In || null,
-      on_duty_meal: form.onDutyMeal,
       received_radio: form.receivedRadio,
       received_pager: form.receivedPager,
       received_keys: form.receivedKeys,
       received_detex: form.receivedDetex,
       received_other: form.receivedOther || null,
       activity_log: entries.filter((e) => e.activity.trim()),
-      missed_rest_break: form.missedRestBreak,
-      missed_meal_period: form.missedMealPeriod,
-      missed_explanation: form.missedExplanation || null,
       signature: form.signature,
     }]);
 
@@ -147,16 +127,6 @@ export default function DARForm() {
       receivedOther: "",
       shiftStart: "",
       shiftEnd: "",
-      mealBreakOut: "",
-      mealBreakIn: "",
-      restBreak1Out: "",
-      restBreak1In: "",
-      restBreak2Out: "",
-      restBreak2In: "",
-      onDutyMeal: false,
-      missedRestBreak: false,
-      missedMealPeriod: false,
-      missedExplanation: "",
       signature: "",
     });
     setEntries([
@@ -244,33 +214,12 @@ export default function DARForm() {
             <Field label="Other Received Items" value={form.receivedOther} onChange={set("receivedOther")} placeholder="Specify if applicable" />
           </div>
 
-          <SectionBar label="Section II: Record of Hours Worked and Breaks" />
+          <SectionBar label="Section II: Record of Hours Worked" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <Row>
-              <Field label="Time In (shift start)" value={form.shiftStart} onChange={set("shiftStart")} placeholder="e.g. 6:00 PM or 1800" />
-              <Field label="Time Out (shift end)" value={form.shiftEnd} onChange={set("shiftEnd")} placeholder="e.g. 2:00 AM or 0200" />
+              <Field label="Time In (shift start)" value={form.shiftStart} onChange={set("shiftStart")} placeholder="1800" />
+              <Field label="Time Out (shift end)" value={form.shiftEnd} onChange={set("shiftEnd")} placeholder="0200" />
             </Row>
-            <Row>
-              <Field label="Time Out (meal break)" value={form.mealBreakOut} onChange={set("mealBreakOut")} placeholder="e.g. 10:00 PM or 2200" />
-              <Field label="Time In (meal break)" value={form.mealBreakIn} onChange={set("mealBreakIn")} placeholder="e.g. 10:30 PM or 2230" />
-            </Row>
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <Label>Rest Break 1</Label>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <input value={form.restBreak1Out} onChange={set("restBreak1Out")} placeholder="Out (e.g. 8:00 PM)" style={{ ...inputStyle, flex: 1 }} />
-                  <input value={form.restBreak1In} onChange={set("restBreak1In")} placeholder="In (e.g. 8:15 PM)" style={{ ...inputStyle, flex: 1 }} />
-                </div>
-              </div>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <Label>Rest Break 2</Label>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <input value={form.restBreak2Out} onChange={set("restBreak2Out")} placeholder="Out (e.g. 11:30 PM)" style={{ ...inputStyle, flex: 1 }} />
-                  <input value={form.restBreak2In} onChange={set("restBreak2In")} placeholder="In (e.g. 11:45 PM)" style={{ ...inputStyle, flex: 1 }} />
-                </div>
-              </div>
-            </div>
-            <CheckboxItem label='Check here if your post has an "On-Duty" paid meal period' checked={form.onDutyMeal} onChange={toggle("onDutyMeal")} />
           </div>
 
           <SectionBar label="Section III: Activity Details" />
@@ -292,7 +241,7 @@ export default function DARForm() {
                 <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
                   <div style={{ width: 100 }}>
                     <Label>From</Label>
-                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder="6:00 PM" style={inputStyle} />
+                    <input value={entry.from} onChange={(e) => updateEntry(entry.id, "from", e.target.value)} placeholder="1800" style={inputStyle} />
                   </div>
                   <div style={{ width: 100 }}>
                     <Label>To</Label>
@@ -316,19 +265,6 @@ export default function DARForm() {
             <div style={{ fontSize: "0.78rem", color: TEXT, lineHeight: 1.65, marginBottom: "1rem", background: SOFT_BG, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${NAVY}`, borderRadius: 3, padding: "0.75rem 1rem" }}>
               By your signature, you acknowledge that the information on this DAR is a true and accurate record of your time and account activity today.
             </div>
-            <div style={{ marginBottom: "1rem" }}>
-              <Label>I did not receive my:</Label>
-              <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.4rem", flexWrap: "wrap" }}>
-                <CheckboxItem label="Rest Break" checked={form.missedRestBreak} onChange={toggle("missedRestBreak")} />
-                <CheckboxItem label="Meal Period Today" checked={form.missedMealPeriod} onChange={toggle("missedMealPeriod")} />
-              </div>
-            </div>
-            {(form.missedRestBreak || form.missedMealPeriod) && (
-              <div style={{ marginBottom: "1rem" }}>
-                <Label>Explain:</Label>
-                <textarea value={form.missedExplanation} onChange={set("missedExplanation")} placeholder="Provide explanation..." rows={3} style={{ ...inputStyle, resize: "vertical" as const }} />
-              </div>
-            )}
             <Field label="Signature (type full name)" value={form.signature} onChange={set("signature")} placeholder="Full legal name" required />
             {error && (
               <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginBottom: "1rem" }}>
