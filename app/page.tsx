@@ -191,6 +191,23 @@ export default function DARForm() {
 
         <div style={{ padding: "0 0 2rem" }}>
 
+          <div style={{ padding: "1.25rem 2rem 0" }}>
+            <a href="/scan" style={{ display: "flex", alignItems: "center", gap: "1rem", background: SOFT_BG, border: `1.5px solid ${BORDER}`, borderLeft: `4px solid ${NAVY}`, borderRadius: 6, padding: "1rem 1.25rem", textDecoration: "none", color: NAVY }}>
+              <div style={{ flex: "none", width: 44, height: 44, borderRadius: 8, background: NAVY, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: "0.95rem", letterSpacing: "0.01em" }}>Have a paper DAR?</div>
+                <div style={{ fontSize: "0.78rem", color: MUTED, marginTop: 2 }}>Tap here to scan and upload it instead of filling this form out</div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </a>
+          </div>
+
           <SectionBar label="Section I: Employee Information" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <Field label="Officer on Duty" value={form.officerName} onChange={set("officerName")} required placeholder="Full legal name" />
@@ -281,15 +298,6 @@ export default function DARForm() {
 
           <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: "2rem", padding: "0.85rem 2rem 0", fontSize: "0.72rem", color: MUTED, textAlign: "center" }}>
             Allied Universal Security Services &nbsp;·&nbsp; Washington University &nbsp;·&nbsp; Please keep all completed forms on file for audit purposes.
-          </div>
-
-          <div style={{ padding: "0.75rem 2rem 0", textAlign: "center" }}>
-            <a href="/scan" style={{ fontSize: "0.78rem", color: MUTED, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-              </svg>
-              Have a paper DAR to scan? Upload it here
-            </a>
           </div>
         </div>
       </div>
