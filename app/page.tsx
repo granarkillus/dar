@@ -260,10 +260,10 @@ export default function DARForm() {
                     <Label>To</Label>
                     <input value={entry.to} onChange={(e) => updateEntry(entry.id, "to", e.target.value)} placeholder={activityTimePlaceholder(index).to} style={inputStyle} />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <Label>Activity</Label>
-                    <input value={entry.activity} onChange={(e) => updateEntry(entry.id, "activity", e.target.value)} placeholder="Describe activity or incident" style={inputStyle} />
-                  </div>
+                </div>
+                <div>
+                  <Label>Activity</Label>
+                  <input value={entry.activity} onChange={(e) => updateEntry(entry.id, "activity", e.target.value)} placeholder="Describe activity or incident" style={inputStyle} />
                 </div>
               </div>
             ))}
