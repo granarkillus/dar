@@ -26,7 +26,16 @@ interface ActivityEntry {
 }
 
 export default function DARForm() {
-  const today = new Date().toISOString().split("T")[0];
+  // Central Time today — avoids UTC date being one day behind after 6pm CT
+  const getCentralToday = () => {
+    const now = new Date();
+    const central = new Date(now.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+    const m = String(central.getMonth() + 1).padStart(2, "0");
+    const d = String(central.getDate()).padStart(2, "0");
+    const y = central.getFullYear();
+    return `${m}/${d}/${y}`;
+  };
+  const today = getCentralToday();
 
   const [form, setForm] = useState({
     officerName: "",
@@ -116,7 +125,7 @@ export default function DARForm() {
       officerName: "",
       clientSite: "Washington University",
       branch: "Saint Louis",
-      date: today,
+      date: getCentralToday(),
       scheduledShift: "",
       receivedRadio: false,
       receivedPager: false,
@@ -213,7 +222,7 @@ export default function DARForm() {
             <Field label="Officer on Duty" value={form.officerName} onChange={set("officerName")} required placeholder="Full legal name" />
             <Row>
               <Field label="Client / Site" value={form.clientSite} onChange={set("clientSite")} />
-              <Field label="Today's Date" value={form.date} onChange={set("date")} type="date" required />
+              <Field label="Today's Date" value={form.date} onChange={set("date")} type="text" placeholder="MM/DD/YYYY" required />
             </Row>
             <Row>
               <Field label="Branch" value={form.branch} onChange={set("branch")} />
