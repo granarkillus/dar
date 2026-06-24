@@ -80,7 +80,15 @@ export default function ScanPage() {
       setEditMode(true);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
-      setError(msg);
+      if (msg.toLowerCase().includes("pattern") || msg.toLowerCase().includes("json") || msg.toLowerCase().includes("format")) {
+        setError("Couldn't read the form clearly. Try again with better lighting, or make sure the whole form is visible and in frame.");
+      } else if (msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("auth") || msg.toLowerCase().includes("401")) {
+        setError("Scan service unavailable. Please submit your DAR manually using the digital form.");
+      } else if (msg.toLowerCase().includes("network") || msg.toLowerCase().includes("fetch")) {
+        setError("Connection error. Check your internet and try again.");
+      } else {
+        setError("Scan failed. Try a clearer photo with better lighting, or submit your DAR using the digital form instead.");
+      }
     }
 
     setScanning(false);
@@ -289,7 +297,7 @@ export default function ScanPage() {
                         <button onClick={() => removeActivityRow(i)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: "0.75rem", padding: 0 }}>Remove</button>
                       )}
                     </div>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.4rem" }}>
                       <div style={{ width: 100 }}>
                         <Label>From</Label>
                         <input value={entry.from} onChange={(e) => updateActivity(i, "from", e.target.value)} placeholder="1800" style={inputStyle} />
@@ -298,10 +306,10 @@ export default function ScanPage() {
                         <Label>To</Label>
                         <input value={entry.to} onChange={(e) => updateActivity(i, "to", e.target.value)} placeholder="2000" style={inputStyle} />
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <Label>Activity</Label>
-                        <input value={entry.activity} onChange={(e) => updateActivity(i, "activity", e.target.value)} placeholder="Describe activity" style={inputStyle} />
-                      </div>
+                    </div>
+                    <div>
+                      <Label>Activity</Label>
+                      <input value={entry.activity} onChange={(e) => updateActivity(i, "activity", e.target.value)} placeholder="Describe activity" style={inputStyle} />
                     </div>
                   </div>
                 ))}
