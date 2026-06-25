@@ -81,7 +81,13 @@ Rules:
   }
 
   try {
-    const parsed = JSON.parse(textBlock.text.trim());
+    const clean = textBlock.text
+      .trim()
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "")
+      .trim();
+    const parsed = JSON.parse(clean);
     return NextResponse.json(parsed);
   } catch {
     return NextResponse.json(
