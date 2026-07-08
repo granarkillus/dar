@@ -26,7 +26,6 @@ interface ActivityEntry {
 }
 
 export default function DARForm() {
-  // Central Time today — avoids UTC date being one day behind after 6pm CT
   const getCentralToday = () => {
     const now = new Date();
     const central = new Date(now.toLocaleString("en-US", { timeZone: "America/Chicago" }));
@@ -62,6 +61,7 @@ export default function DARForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [submittedDate, setSubmittedDate] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -116,6 +116,7 @@ export default function DARForm() {
       return;
     }
 
+    setSubmittedDate(form.date);
     setSubmitted(true);
     setSubmitting(false);
   };
@@ -163,7 +164,7 @@ export default function DARForm() {
             </div>
             <div style={{ fontSize: "1.1rem", fontWeight: 700, color: TEXT, marginBottom: 8 }}>DAR Submitted</div>
             <div style={{ color: MUTED, fontSize: "0.85rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-              Your Daily Activity Report for {new Date(form.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} has been recorded.
+              Your Daily Activity Report for {submittedDate || "today"} has been recorded.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               <button onClick={handleReset} style={btnStyle(NAVY)}>Submit Another DAR</button>
@@ -330,9 +331,6 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Generates "1800 to 2000, then 2000 to 2200, then 2200 to 2400, then 0000 to
-// 0200, ..." so each activity row's placeholder shows the next two-hour
-// block of the shift, modeling the expected flow of entries.
 function activityTimePlaceholder(index: number): { from: string; to: string } {
   const startHour = (18 + index * 2) % 24;
   const endHour = startHour + 2;
