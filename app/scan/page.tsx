@@ -43,7 +43,6 @@ export default function ScanPage() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
-      // Strip the data URL prefix to get raw base64
       setImage(result.split(",")[1]);
       setImageType(file.type || "image/jpeg");
     };
@@ -71,7 +70,6 @@ export default function ScanPage() {
 
       const parsed: ExtractedDAR = data;
 
-      // Ensure activity_log is always an array with at least one row
       if (!parsed.activity_log || parsed.activity_log.length === 0) {
         parsed.activity_log = [{ from: "", to: "", activity: "" }];
       }
@@ -173,7 +171,7 @@ export default function ScanPage() {
             </div>
             <div style={{ fontSize: "1.1rem", fontWeight: 700, color: TEXT, marginBottom: 8 }}>DAR Saved</div>
             <div style={{ color: MUTED, fontSize: "0.85rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-              The scanned DAR for {extracted?.officer_name} has been saved to the system.
+              The scanned DAR for {extracted?.officer_name || "the officer"} has been saved to the system.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               <button onClick={() => { setImage(null); setExtracted(null); setSubmitted(false); setEditMode(false); }} style={btnStyle(NAVY)}>Scan Another DAR</button>
@@ -189,7 +187,6 @@ export default function ScanPage() {
     <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
       <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden" }}>
 
-        {/* Header */}
         <div style={{ background: NAVY, padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
@@ -212,7 +209,6 @@ export default function ScanPage() {
 
         <div style={{ padding: "0 0 2rem" }}>
 
-          {/* Step 1: Upload */}
           <SectionBar label="Step 1 — Take or Upload a Photo of the Paper DAR" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
             <div
@@ -258,7 +254,6 @@ export default function ScanPage() {
             )}
           </div>
 
-          {/* Step 2: Review & correct */}
           {editMode && extracted && (
             <>
               <SectionBar label="Step 2 — Review and Correct Before Saving" />
@@ -269,7 +264,7 @@ export default function ScanPage() {
 
                 <Row>
                   <Field label="Officer Name *" value={extracted.officer_name} onChange={(e) => updateField("officer_name", e.target.value)} />
-                  <Field label="Date *" value={extracted.date} onChange={(e) => updateField("date", e.target.value)} type="date" />
+                  <Field label="Date *" value={extracted.date} onChange={(e) => updateField("date", e.target.value)} type="text" placeholder="MM/DD/YYYY" />
                 </Row>
                 <Row>
                   <Field label="Scheduled Shift / Post" value={extracted.scheduled_shift} onChange={(e) => updateField("scheduled_shift", e.target.value)} />
