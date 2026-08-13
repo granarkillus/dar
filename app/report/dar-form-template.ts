@@ -65,6 +65,18 @@ function formatDate(iso: string): string {
   return `${m}/${d}/${y}`;
 }
 
+// Formats the record's original submission timestamp, e.g.
+// "Submitted 7/14/2026 2:41 PM" — a fixed value from submitted_at,
+// not the moment the PDF happens to be printed.
+function formatSubmittedStamp(iso?: string): string {
+  if (!iso) return "";
+  const when = new Date(iso);
+  if (isNaN(when.getTime())) return "";
+  const datePart = when.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" });
+  const timePart = when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  return `Submitted ${datePart} ${timePart}`;
+}
+
 // Accepts "HH:MM" (24hr, from <input type="time">), "H:MM AM/PM",
 // or an already-formatted string. Returns the time portion (12hr where
 // possible) and an AM/PM flag for the circle.
@@ -138,6 +150,18 @@ body {
   position: relative;
 }
 .page:last-child { page-break-after: auto; }
+
+/* generation timestamp stamp — sits in the bottom-right margin,
+   absolutely positioned within the page box so it never adds to the
+   page's height or pushes any form content around. */
+.gen-stamp {
+  position: absolute;
+  bottom: 0.1in;
+  right: 0.42in;
+  font-size: 6.5pt;
+  color: #9ca3af;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
 
 /* header */
 .header {
@@ -320,6 +344,7 @@ function buildPage(dar: DARRecord, rows: ActivityEntry[], pageNum: number, pageT
   const detex = mark(dar.received_detex);
   const other = dar.received_other || "";
   const onDutyMeal = mark(dar.on_duty_meal);
+  const submittedStamp = formatSubmittedStamp(dar.submitted_at);
 
   return `
 <div class="page">
@@ -440,6 +465,8 @@ function buildPage(dar: DARRecord, rows: ActivityEntry[], pageNum: number, pageT
     <span class="lbl">SIGNATURE:</span><span class="sig-line officer">${esc(dar.signature)}</span>
     <span class="lbl">SUPERVISOR:</span><span class="sig-line sup"></span>
   </div>
+
+  <div class="gen-stamp">${esc(submittedStamp)}</div>
 </div>`;
 }
 
@@ -450,6 +477,13 @@ function buildPage(dar: DARRecord, rows: ActivityEntry[], pageNum: number, pageT
 /**
  * Builds a full print-ready HTML document. Each DARRecord becomes one
  * page (or several, if its activity log has more than 18 entries).
+ * Every page gets a small "Submitted [date] [time]" stamp in the
+ * bottom-right margin, taken from that record's own submitted_at value.
+ * This is a fixed timestamp — it reflects when the officer originally
+ * submitted the DAR, not when the PDF happens to be printed, so it
+ * reads the same no matter how many times or when the form is reprinted.
+ * The stamp is absolutely positioned inside the fixed 8.5x11in page box,
+ * so it never adds height or shifts any of the form content.
  */
 export function buildDarFormDocument(dars: DARRecord[]): string {
   const pages: string[] = [];
