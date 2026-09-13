@@ -62,6 +62,9 @@ export default function DARForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [submittedDate, setSubmittedDate] = useState("");
+  // Captured at submit time so the success screen can link straight to this
+  // officer's own lookup list without them typing their name again.
+  const [submittedName, setSubmittedName] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -117,6 +120,7 @@ export default function DARForm() {
     }
 
     setSubmittedDate(form.date);
+    setSubmittedName(form.officerName);
     setSubmitted(true);
     setSubmitting(false);
   };
@@ -168,7 +172,8 @@ export default function DARForm() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               <button onClick={handleReset} style={btnStyle(NAVY)}>Submit Another DAR</button>
-              <a href="https://portal.xing.wtf" style={btnOutlineStyle(NAVY)}>Go to Officer Portal</a>
+              <a href={`/my-dars?name=${encodeURIComponent(submittedName)}`} style={btnOutlineStyle(NAVY)}>View My Recent DARs</a>
+              <a href="https://portal.xing.wtf" style={btnOutlineStyle(MUTED)}>Go to Officer Portal</a>
             </div>
           </div>
         </div>
