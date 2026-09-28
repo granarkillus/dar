@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { useState, useEffect } from "react";
+import { getSupabase, requireSupervisor } from "@/lib/supabase";
 import { buildDarFormDocument, DARRecord } from "./dar-form-template";
 
 const NAVY = "#1f4e79";
@@ -13,14 +13,12 @@ const BORDER = "#d1d5db";
 const TEXT = "#1a1a2e";
 const GREEN = "#2f6b3a";
 
-const getSupabase = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
 export default function DARReport() {
   const [startDate, setStartDate] = useState("");
+
+  // Supervisors only.
+  useEffect(() => { requireSupervisor(); }, []);
   const [endDate, setEndDate] = useState("");
   const [officerFilter, setOfficerFilter] = useState("");
   const [records, setRecords] = useState<DARRecord[]>([]);

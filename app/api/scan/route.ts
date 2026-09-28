@@ -1,6 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// The scanner is used by officers without logging in, so it can't require
+// auth. These checks keep other sites and scripts from running up the
+// Anthropic bill through it.
+const MAX_IMAGE_CHARS = 8_000_000; // ~6 MB image as base64
+const RATE_LIMIT = 20;              // scans per IP per hour (per server instance)
+const hits = new Map<string, number[]>();
+
+function allowedOrigin(req: NextRequest): boolean {
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  try {
+    const host = new URL(origin).hostname;
+    return host === req.nextUrl.hostname || host.endsWith(".xing.wtf") || host === "localhost";
+  } catch {
+    return false;
+  }
+}
+
+function rateLimited(req: NextRequest): boolean {
+  const ip = (req.headers.get("x-forwarded-for") || "unknown").split(",")[0].trim();
+  const now = Date.now();
+  const recent = (hits.get(ip) || []).filter((t) => now - t < 60 * 60 * 1000);
+  recent.push(now);
+  hits.set(ip, recent);
+  return recent.length > RATE_LIMIT;
+}
+
 export async function POST(req: NextRequest) {
+  if (!allowedOrigin(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (rateLimited(req)) {
+    return NextResponse.json({ error: "Too many scans. Please try again later." }, { status: 429 });
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "API key not configured" }, { status: 500 });
@@ -16,6 +49,9 @@ export async function POST(req: NextRequest) {
   const { image, mediaType } = body;
   if (!image || !mediaType) {
     return NextResponse.json({ error: "Missing image or mediaType" }, { status: 400 });
+  }
+  if (typeof image !== "string" || image.length > MAX_IMAGE_CHARS || !/^image\/(jpeg|png|gif|webp)$/.test(mediaType)) {
+    return NextResponse.json({ error: "Image too large or unsupported type" }, { status: 400 });
   }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {

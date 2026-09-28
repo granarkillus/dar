@@ -1,13 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const getSupabase = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+import { useState, useEffect } from "react";
+import { getPublicSupabase } from "@/lib/supabase";
+import { getRememberedDars } from "@/lib/my-dars";
 
 const NAVY = "#1f4e79";
 const DARK = "#1a1a2e";
@@ -36,7 +31,6 @@ interface DARRow {
 }
 
 export default function MyDARsPage() {
-  const [name, setName] = useState("");
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [records, setRecords] = useState<DARRow[]>([]);
@@ -53,44 +47,24 @@ export default function MyDARsPage() {
     });
   };
 
-  const runSearch = useCallback(async (lookupName: string) => {
-    const trimmed = lookupName.trim();
-    if (!trimmed) return;
-
-    setLoading(true);
-    setError("");
-    setSearched(true);
-
-    const supabase = getSupabase();
-    const { data, error: dbError } = await supabase
-      .from("dar_submissions")
-      .select("id, officer_name, date, scheduled_shift, shift_start, shift_end, activity_log, submitted_at")
-      .ilike("officer_name", trimmed)
-      .order("submitted_at", { ascending: false })
-      .limit(10);
-
-    if (dbError) {
-      setError("Couldn't load your reports. Please try again.");
-      setRecords([]);
-      setLoading(false);
-      return;
-    }
-
-    setRecords(data || []);
-    setLoading(false);
-  }, []);
-
-  // If we arrived straight from a submission, the name comes in on the URL
-  // so the officer immediately sees their own list without typing anything.
+  // Loads the DARs this phone submitted (remembered on the device at submit time).
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const n = params.get("name");
-    if (n) {
-      const decoded = decodeURIComponent(n);
-      setName(decoded);
-      runSearch(decoded);
-    }
-  }, [runSearch]);
+    const ids = getRememberedDars();
+    setSearched(true);
+    if (ids.length === 0) return;
+    setLoading(true);
+    getPublicSupabase()
+      .rpc("get_my_dars", { p_ids: ids })
+      .then(({ data, error: dbError }) => {
+        if (dbError) {
+          setError("Couldn't load your reports. Please try again.");
+          setRecords([]);
+        } else {
+          setRecords(((data as DARRow[]) || []).slice(0, 10));
+        }
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
@@ -114,25 +88,8 @@ export default function MyDARsPage() {
 
         <div style={{ padding: "1.5rem 2rem" }}>
 
-          <div style={{ fontSize: "0.85rem", color: MUTED, lineHeight: 1.5, marginBottom: "1rem" }}>
-            Enter your name exactly as you write it on your DAR to see your last 10 submissions.
-          </div>
-
-          <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", marginBottom: "1.25rem" }}>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") runSearch(name); }}
-              placeholder="Your full name"
-              style={{ flex: 1, minWidth: 200, boxSizing: "border-box", padding: "0.55rem 0.75rem", border: `1px solid ${BORDER}`, borderRadius: 4, fontSize: "0.92rem", color: TEXT, background: "#fafbfc", outline: "none", fontFamily: "inherit" }}
-            />
-            <button
-              onClick={() => runSearch(name)}
-              disabled={!name.trim() || loading}
-              style={{ background: name.trim() && !loading ? NAVY : "#9ca3af", color: WHITE, border: "none", borderRadius: 4, padding: "0.55rem 1.5rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: name.trim() && !loading ? "pointer" : "not-allowed", fontFamily: "inherit", textTransform: "uppercase" }}
-            >
-              {loading ? "Looking..." : "Look Up"}
-            </button>
+          <div style={{ fontSize: "0.85rem", color: MUTED, lineHeight: 1.5, marginBottom: "1.25rem" }}>
+            {loading ? "Loading your reports..." : "These are the DARs submitted from this phone."}
           </div>
 
           {error && (
@@ -143,10 +100,10 @@ export default function MyDARsPage() {
 
           {searched && !loading && !error && records.length === 0 && (
             <div style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "1.5rem", textAlign: "center" }}>
-              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: TEXT, marginBottom: 6 }}>No reports found for that name</div>
+              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: TEXT, marginBottom: 6 }}>No reports on this phone yet</div>
               <div style={{ fontSize: "0.82rem", color: MUTED, lineHeight: 1.5 }}>
-                Double-check the spelling — it has to match how you typed it on the DAR.
-                If you still don't see it, let your supervisor know.
+                DARs you submit from this phone will show up here. Reports sent from another
+                phone or before this list existed won't appear, but your supervisor still has them.
               </div>
             </div>
           )}
@@ -189,7 +146,7 @@ export default function MyDARsPage() {
           )}
 
           <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: "1.5rem", paddingTop: "1rem", fontSize: "0.75rem", color: MUTED, textAlign: "center", lineHeight: 1.5 }}>
-            This shows your last 10 submissions. If something looks wrong or missing, tell your supervisor.
+            This shows your last 10 submissions from this phone. If something looks wrong or missing, tell your supervisor.
           </div>
 
         </div>
