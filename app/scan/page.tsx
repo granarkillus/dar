@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { getPublicSupabase } from "@/lib/supabase";
+import { newDarId, rememberDar } from "@/lib/my-dars";
 
 const NAVY = "#1f4e79";
 const DARK = "#1a1a2e";
@@ -122,13 +124,11 @@ export default function ScanPage() {
     setSubmitting(true);
     setError("");
 
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = getPublicSupabase();
+    const darId = newDarId();
 
     const { error: dbError } = await supabase.from("dar_submissions").insert([{
+      id: darId,
       officer_name: extracted.officer_name,
       client_site: "Washington University",
       branch: "Saint Louis",
@@ -150,6 +150,7 @@ export default function ScanPage() {
       return;
     }
 
+    rememberDar(darId);
     setSubmitted(true);
     setSubmitting(false);
   };

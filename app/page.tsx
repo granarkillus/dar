@@ -1,13 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const getSupabase = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+import { getPublicSupabase } from "@/lib/supabase";
+import { newDarId, rememberDar } from "@/lib/my-dars";
 
 const NAVY = "#1f4e79";
 const DARK = "#1a1a2e";
@@ -96,8 +91,10 @@ export default function DARForm() {
     setSubmitting(true);
     setError("");
 
-    const supabase = getSupabase();
+    const supabase = getPublicSupabase();
+    const darId = newDarId();
     const { error: dbError } = await supabase.from("dar_submissions").insert([{
+      id: darId,
       officer_name: form.officerName,
       client_site: form.clientSite,
       branch: form.branch,
@@ -119,6 +116,7 @@ export default function DARForm() {
       return;
     }
 
+    rememberDar(darId);
     setSubmittedDate(form.date);
     setSubmittedName(form.officerName);
     setSubmitted(true);
@@ -172,7 +170,7 @@ export default function DARForm() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               <button onClick={handleReset} style={btnStyle(NAVY)}>Submit Another DAR</button>
-              <a href={`/my-dars?name=${encodeURIComponent(submittedName)}`} style={btnOutlineStyle(NAVY)}>View My Recent DARs</a>
+              <a href="/my-dars" style={btnOutlineStyle(NAVY)}>View My Recent DARs</a>
               <a href="https://portal.xing.wtf" style={btnOutlineStyle(MUTED)}>Go to Officer Portal</a>
             </div>
           </div>
