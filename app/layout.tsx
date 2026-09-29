@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import MovedToPortal from './MovedToPortal'
 
 export const metadata: Metadata = {
   title: "AUS Daily Activity Report",
@@ -24,7 +25,8 @@ export default function RootLayout({
         <meta name="theme-color" content="#1a4480" />
       </head>
       <body>
-        {children}
+        {/* Pages are no longer shown here; everyone is sent to portal.xing.wtf/dar. */}
+        <MovedToPortal />
       </body>
     </html>
   )
