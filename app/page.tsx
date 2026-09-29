@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { getPublicSupabase } from "@/lib/supabase";
+import { getOfficer, rememberOfficer } from "@/lib/officer-memory";
 import { newDarId, rememberDar } from "@/lib/my-dars";
 
-const NAVY = "#1f4e79";
-const DARK = "#1a1a2e";
-const SOFT_BG = "#f4f6f9";
+const NAVY = "#1a4480";
+const DARK = "#243b5e";
+const SOFT_BG = "#f2f5fa";
 const WHITE = "#ffffff";
-const MUTED = "#6b7280";
-const BORDER = "#d1d5db";
-const TEXT = "#1a1a2e";
-const GREEN = "#2f6b3a";
+const MUTED = "#5b6474";
+const BORDER = "#dbe2ec";
+const TEXT = "#0f172a";
+const GREEN = "#15803d";
 
 interface ActivityEntry {
   id: number;
@@ -84,10 +85,19 @@ export default function DARForm() {
   const updateEntry = (id: number, field: string, value: string) =>
     setEntries((e) => e.map((entry) => entry.id === id ? { ...entry, [field]: value } : entry));
 
+  // Show what's missing (in red) once they've tried to submit.
+  const [triedSubmit, setTriedSubmit] = useState(false);
+
+  // Fill in the officer's details remembered from their last Allied form.
+  useEffect(() => {
+    const me = getOfficer();
+    if (me.name) setForm((f) => ({ ...f, officerName: f.officerName || me.name || "", scheduledShift: f.scheduledShift || me.post || "" }));
+  }, []);
+
   const required = form.officerName && form.date && form.signature;
 
   const handleSubmit = async () => {
-    if (!required) return;
+    if (!required) { setTriedSubmit(true); return; }
     setSubmitting(true);
     setError("");
 
@@ -119,6 +129,7 @@ export default function DARForm() {
     rememberDar(darId);
     setSubmittedDate(form.date);
     setSubmittedName(form.officerName);
+    rememberOfficer({ name: form.officerName.trim(), post: form.scheduledShift.trim() || undefined });
     setSubmitted(true);
     setSubmitting(false);
   };
@@ -150,9 +161,9 @@ export default function DARForm() {
 
   if (submitted) {
     return (
-      <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
-        <div style={{ maxWidth: 480, width: "100%", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden", textAlign: "center" }}>
-          <div style={{ background: NAVY, padding: "1.25rem 2rem" }}>
+      <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "var(--font-sans)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
+        <div style={{ maxWidth: 480, width: "100%", background: WHITE, borderRadius: 12, boxShadow: "0 10px 30px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.06)", overflow: "hidden", textAlign: "center" }}>
+          <div style={{ background: "linear-gradient(135deg, #0f2d57 0%, #1d4f91 100%)", padding: "1.25rem 2rem" }}>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300 }}>™</sup>
             </div>
@@ -180,10 +191,10 @@ export default function DARForm() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "var(--font-sans)", padding: "2rem 1rem" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 12, boxShadow: "0 10px 30px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.06)", overflow: "hidden" }}>
 
-        <div style={{ background: NAVY, padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="hdr" style={{ background: "linear-gradient(135deg, #0f2d57 0%, #1d4f91 100%)", padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300, marginLeft: 1 }}>™</sup>
@@ -255,7 +266,7 @@ export default function DARForm() {
             </div>
 
             {entries.map((entry, index) => (
-              <div key={entry.id} style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "0.75rem 1rem", marginBottom: "0.75rem" }}>
+              <div key={entry.id} style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.75rem 1rem", marginBottom: "0.75rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
                   <span style={{ fontSize: "0.72rem", fontWeight: 700, color: NAVY, textTransform: "uppercase", letterSpacing: "0.05em" }}>Entry {index + 1}</span>
                   {entries.length > 1 && (
@@ -281,31 +292,31 @@ export default function DARForm() {
               </div>
             ))}
 
-            <button onClick={addEntry} style={{ background: "none", border: `1.5px dashed ${NAVY}`, borderRadius: 4, color: NAVY, padding: "0.6rem 1rem", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: "0.5rem", fontFamily: "inherit" }}>
+            <button onClick={addEntry} style={{ background: "none", border: `1.5px dashed ${NAVY}`, borderRadius: 12, color: NAVY, padding: "0.6rem 1rem", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: "0.5rem", fontFamily: "inherit" }}>
               + Add Entry
             </button>
           </div>
 
           <SectionBar label="Section IV: Employee Signature" />
           <div style={{ padding: "1.25rem 2rem 0" }}>
-            <div style={{ fontSize: "0.78rem", color: TEXT, lineHeight: 1.65, marginBottom: "1rem", background: SOFT_BG, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${NAVY}`, borderRadius: 3, padding: "0.75rem 1rem" }}>
+            <div style={{ fontSize: "0.78rem", color: TEXT, lineHeight: 1.65, marginBottom: "1rem", background: SOFT_BG, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${NAVY}`, borderRadius: 8, padding: "0.75rem 1rem" }}>
               By your signature, you acknowledge that the information on this DAR is a true and accurate record of your time and account activity today.
             </div>
             <Field label="Signature (type full name)" value={form.signature} onChange={set("signature")} placeholder="Full legal name" required />
             {error && (
-              <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginBottom: "1rem" }}>
+              <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 12, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginBottom: "1rem" }}>
                 {error}
               </div>
             )}
             <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               <button
                 onClick={handleSubmit}
-                disabled={!required || submitting}
-                style={{ ...btnStyle(required && !submitting ? GREEN : "#9ca3af"), cursor: required && !submitting ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                disabled={submitting}
+                style={{ ...btnStyle(!submitting ? GREEN : "#9ca3af"), cursor: !submitting ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
               >
                 {submitting ? "Submitting..." : "Submit DAR"}
               </button>
-              {!required && <div style={{ fontSize: "0.75rem", color: MUTED, textAlign: "center" }}>Officer name, date, and signature are required</div>}
+              {!required && <div style={{ fontSize: "0.75rem", color: triedSubmit ? "#b91c1c" : MUTED, fontWeight: triedSubmit ? 600 : 400, textAlign: "center" }}>Officer name, date, and signature are required</div>}
             </div>
           </div>
 
@@ -320,7 +331,7 @@ export default function DARForm() {
 
 function SectionBar({ label }: { label: string }) {
   return (
-    <div style={{ background: DARK, padding: "0.55rem 2rem", color: WHITE, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: "1.5rem" }}>
+    <div style={{ margin: "1.75rem 2rem 0", paddingBottom: "0.5rem", borderBottom: `2px solid ${NAVY}`, color: NAVY, fontSize: "1.05rem", fontWeight: 700 }}>
       {label}
     </div>
   );
@@ -328,7 +339,7 @@ function SectionBar({ label }: { label: string }) {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+    <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "#334155", marginBottom: 6 }}>
       {children}
     </div>
   );
@@ -359,7 +370,7 @@ function Field({ label, value, onChange, placeholder, type = "text", required: r
 
 function Row({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", gap: "1rem" }}>
+    <div className="stack-sm" style={{ display: "flex", gap: "1rem" }}>
       {Array.isArray(children)
         ? children.map((child, i) => <div key={i} style={{ flex: 1 }}>{child}</div>)
         : <div style={{ flex: 1 }}>{children}</div>}
@@ -383,14 +394,14 @@ function CheckboxItem({ label, checked, onChange }: { label: string; checked: bo
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", boxSizing: "border-box", padding: "0.5rem 0.75rem",
-  border: `1px solid #d1d5db`, borderRadius: 4, fontSize: "0.88rem",
-  color: TEXT, background: "#fafbfc", outline: "none", fontFamily: "inherit",
+  width: "100%", boxSizing: "border-box", padding: "0.75rem 0.9rem",
+  border: `1px solid #d1d5db`, borderRadius: 12, fontSize: "1rem",
+  color: TEXT, background: "#ffffff", outline: "none", fontFamily: "inherit",
 };
 
 function btnStyle(bg: string): React.CSSProperties {
   return {
-    background: bg, color: WHITE, border: "none", borderRadius: 4,
+    background: bg, color: WHITE, border: "none", borderRadius: 12,
     padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700,
     letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit",
     textTransform: "uppercase", width: "100%",
@@ -399,7 +410,7 @@ function btnStyle(bg: string): React.CSSProperties {
 
 function btnOutlineStyle(color: string): React.CSSProperties {
   return {
-    background: "none", color: color, border: `1.5px solid ${color}`, borderRadius: 4,
+    background: "none", color: color, border: `1.5px solid ${color}`, borderRadius: 12,
     padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700,
     letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit",
     textTransform: "uppercase", width: "100%", textAlign: "center" as const,

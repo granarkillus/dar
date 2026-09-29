@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import { getPublicSupabase } from "@/lib/supabase";
 import { getRememberedDars } from "@/lib/my-dars";
 
-const NAVY = "#1f4e79";
-const DARK = "#1a1a2e";
-const SOFT_BG = "#f4f6f9";
+const NAVY = "#1a4480";
+const DARK = "#243b5e";
+const SOFT_BG = "#f2f5fa";
 const WHITE = "#ffffff";
-const MUTED = "#6b7280";
-const BORDER = "#d1d5db";
-const TEXT = "#1a1a2e";
-const GREEN = "#2f6b3a";
+const MUTED = "#5b6474";
+const BORDER = "#dbe2ec";
+const TEXT = "#0f172a";
+const GREEN = "#15803d";
 
 interface ActivityEntry {
   from: string;
@@ -67,10 +67,10 @@ export default function MyDARsPage() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "var(--font-sans)", padding: "2rem 1rem" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 12, boxShadow: "0 10px 30px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.06)", overflow: "hidden" }}>
 
-        <div style={{ background: NAVY, padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+        <div className="hdr" style={{ background: "linear-gradient(135deg, #0f2d57 0%, #1d4f91 100%)", padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
           <div>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300, marginLeft: 1 }}>™</sup>
@@ -93,13 +93,13 @@ export default function MyDARsPage() {
           </div>
 
           {error && (
-            <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.75rem 1rem", fontSize: "0.85rem", color: "#b91c1c", marginBottom: "1rem" }}>
+            <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 12, padding: "0.75rem 1rem", fontSize: "0.85rem", color: "#b91c1c", marginBottom: "1rem" }}>
               {error}
             </div>
           )}
 
           {searched && !loading && !error && records.length === 0 && (
-            <div style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "1.5rem", textAlign: "center" }}>
+            <div style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "1.5rem", textAlign: "center" }}>
               <div style={{ fontSize: "0.92rem", fontWeight: 700, color: TEXT, marginBottom: 6 }}>No reports on this phone yet</div>
               <div style={{ fontSize: "0.82rem", color: MUTED, lineHeight: 1.5 }}>
                 DARs you submit from this phone will show up here. Reports sent from another
@@ -117,7 +117,7 @@ export default function MyDARsPage() {
               {records.map((r) => {
                 const entries = (r.activity_log || []).filter((e) => e.activity && e.activity.trim());
                 return (
-                  <div key={r.id} style={{ border: `1px solid ${BORDER}`, borderLeft: `4px solid ${GREEN}`, borderRadius: 4, padding: "0.85rem 1.1rem", marginBottom: "0.7rem", background: WHITE }}>
+                  <div key={r.id} style={{ border: `1px solid ${BORDER}`, borderLeft: `4px solid ${GREEN}`, borderRadius: 12, padding: "0.85rem 1.1rem", marginBottom: "0.7rem", background: WHITE }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
                       <div style={{ fontSize: "0.95rem", fontWeight: 700, color: TEXT }}>{r.date}</div>
                       <div style={{ fontSize: "0.72rem", color: GREEN, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
