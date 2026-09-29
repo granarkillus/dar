@@ -26,7 +26,7 @@ function rateLimited(req: NextRequest): boolean {
   return recent.length > RATE_LIMIT;
 }
 
-export async function POST(req: NextRequest) {
+async function scan(req: NextRequest): Promise<NextResponse> {
   if (!allowedOrigin(req)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -131,4 +131,31 @@ Rules:
       { status: 422 }
     );
   }
+}
+
+// The DAR form now lives on portal.xing.wtf and calls this scanner from the
+// browser, so allow requests from our own *.xing.wtf sites (CORS).
+function corsHeaders(req: NextRequest): Record<string, string> {
+  const origin = req.headers.get("origin") || "";
+  try {
+    if (new URL(origin).hostname.endsWith(".xing.wtf")) {
+      return {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        Vary: "Origin",
+      };
+    }
+  } catch { /* no or bad origin */ }
+  return {};
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
+export async function POST(req: NextRequest) {
+  const res = await scan(req);
+  for (const [k, v] of Object.entries(corsHeaders(req))) res.headers.set(k, v);
+  return res;
 }
