@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import { getSupabase, requireSupervisor } from "@/lib/supabase";
 import { buildDarFormDocument, DARRecord } from "./dar-form-template";
 
-const NAVY = "#1f4e79";
-const DARK = "#1a1a2e";
-const SOFT_BG = "#f4f6f9";
+const NAVY = "#1a4480";
+const DARK = "#243b5e";
+const SOFT_BG = "#f2f5fa";
 const WHITE = "#ffffff";
-const MUTED = "#6b7280";
-const BORDER = "#d1d5db";
-const TEXT = "#1a1a2e";
-const GREEN = "#2f6b3a";
+const MUTED = "#5b6474";
+const BORDER = "#dbe2ec";
+const TEXT = "#0f172a";
+const GREEN = "#15803d";
 
 
 export default function DARReport() {
@@ -103,10 +103,10 @@ export default function DARReport() {
   const groups = groupByOfficer();
 
   return (
-    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
+    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "var(--font-sans)", padding: "2rem 1rem" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
 
-        <div style={{ background: NAVY, padding: "1.25rem 2rem", borderRadius: "4px 4px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ background: "linear-gradient(135deg, #0f2d57 0%, #1d4f91 100%)", padding: "1.25rem 2rem", borderRadius: "4px 4px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300, marginLeft: 1 }}>™</sup>
@@ -126,7 +126,7 @@ export default function DARReport() {
         </div>
 
         <div style={{ background: WHITE, border: `1px solid ${BORDER}`, borderTop: "none", padding: "1.5rem 2rem", marginBottom: "1.5rem" }}>
-          <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1rem" }}>Search Parameters</div>
+          <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "#334155", marginBottom: "1rem" }}>Search Parameters</div>
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "flex-end" }}>
             <div style={{ flex: 1, minWidth: 160 }}>
               <Label>Start Date *</Label>
@@ -146,13 +146,13 @@ export default function DARReport() {
               </button>
             </div>
           </div>
-          {error && <div style={{ marginTop: "0.75rem", background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.6rem 1rem", fontSize: "0.82rem", color: "#b91c1c" }}>{error}</div>}
+          {error && <div style={{ marginTop: "0.75rem", background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 12, padding: "0.6rem 1rem", fontSize: "0.82rem", color: "#b91c1c" }}>{error}</div>}
         </div>
 
         {searched && (
           <>
             {records.length === 0 ? (
-              <div style={{ background: WHITE, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2rem", textAlign: "center", color: MUTED, fontSize: "0.88rem" }}>
+              <div style={{ background: WHITE, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "2rem", textAlign: "center", color: MUTED, fontSize: "0.88rem" }}>
                 No DAR submissions found for the selected criteria.
               </div>
             ) : (
@@ -171,7 +171,7 @@ export default function DARReport() {
 
                 {Object.entries(groups).map(([officer, dars]) => (
                   <div key={officer} style={{ background: WHITE, border: `1px solid ${BORDER}`, borderTop: "none" }}>
-                    <div style={{ background: "#eef3f8", padding: "0.6rem 2rem", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ background: "#eaf1fb", padding: "0.6rem 2rem", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontWeight: 700, color: NAVY, fontSize: "0.9rem" }}>{officer}</span>
                       <span style={{ color: MUTED, fontSize: "0.78rem" }}>{dars.length} submission{dars.length !== 1 ? "s" : ""}</span>
                     </div>
@@ -189,7 +189,7 @@ export default function DARReport() {
                           )}
                         </div>
                         {dar.activity_log && dar.activity_log.filter((e) => e.activity?.trim()).length > 0 ? (
-                          <div style={{ background: SOFT_BG, borderRadius: 3, padding: "0.5rem 0.75rem", marginBottom: "0.5rem" }}>
+                          <div style={{ background: SOFT_BG, borderRadius: 8, padding: "0.5rem 0.75rem", marginBottom: "0.5rem" }}>
                             {dar.activity_log.filter((e) => e.activity?.trim()).map((entry, j) => (
                               <div key={j} style={{ display: "flex", gap: "0.75rem", fontSize: "0.8rem", color: TEXT, marginBottom: j < dar.activity_log.length - 1 ? "0.25rem" : 0 }}>
                                 <span style={{ color: MUTED, whiteSpace: "nowrap", minWidth: 80 }}>{entry.from} – {entry.to}</span>
@@ -208,7 +208,7 @@ export default function DARReport() {
                         )}
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem" }}>
                           <div style={{ fontSize: "0.75rem", color: MUTED }}>Signed: {dar.signature}</div>
-                          <button onClick={() => generateSinglePDF(dar)} style={{ background: "none", border: `1px solid ${BORDER}`, borderRadius: 4, color: MUTED, padding: "0.3rem 0.7rem", fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
+                          <button onClick={() => generateSinglePDF(dar)} style={{ background: "none", border: `1px solid ${BORDER}`, borderRadius: 12, color: MUTED, padding: "0.3rem 0.7rem", fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
                             Print DAR Form
                           </button>
@@ -236,18 +236,18 @@ export default function DARReport() {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+    <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "#334155", marginBottom: 6 }}>
       {children}
     </div>
   );
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", boxSizing: "border-box", padding: "0.5rem 0.75rem",
-  border: "1px solid #d1d5db", borderRadius: 4, fontSize: "0.88rem",
-  color: "#1a1a2e", background: "#fafbfc", outline: "none", fontFamily: "inherit",
+  width: "100%", boxSizing: "border-box", padding: "0.75rem 0.9rem",
+  border: "1px solid #d1d5db", borderRadius: 12, fontSize: "1rem",
+  color: "#1a1a2e", background: "#ffffff", outline: "none", fontFamily: "inherit",
 };
 
 function btnStyle(bg: string): React.CSSProperties {
-  return { background: bg, color: "#ffffff", border: "none", borderRadius: 4, padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", width: "100%" };
+  return { background: bg, color: "#ffffff", border: "none", borderRadius: 12, padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", width: "100%" };
 }

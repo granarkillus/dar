@@ -4,14 +4,14 @@ import { useState, useRef } from "react";
 import { getPublicSupabase } from "@/lib/supabase";
 import { newDarId, rememberDar } from "@/lib/my-dars";
 
-const NAVY = "#1f4e79";
-const DARK = "#1a1a2e";
-const SOFT_BG = "#f4f6f9";
+const NAVY = "#1a4480";
+const DARK = "#243b5e";
+const SOFT_BG = "#f2f5fa";
 const WHITE = "#ffffff";
-const MUTED = "#6b7280";
-const BORDER = "#d1d5db";
-const TEXT = "#1a1a2e";
-const GREEN = "#2f6b3a";
+const MUTED = "#5b6474";
+const BORDER = "#dbe2ec";
+const TEXT = "#0f172a";
+const GREEN = "#15803d";
 
 interface ExtractedDAR {
   officer_name: string;
@@ -157,9 +157,9 @@ export default function ScanPage() {
 
   if (submitted) {
     return (
-      <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
-        <div style={{ maxWidth: 480, width: "100%", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden", textAlign: "center" }}>
-          <div style={{ background: NAVY, padding: "1.25rem 2rem" }}>
+      <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "var(--font-sans)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
+        <div style={{ maxWidth: 480, width: "100%", background: WHITE, borderRadius: 12, boxShadow: "0 10px 30px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.06)", overflow: "hidden", textAlign: "center" }}>
+          <div style={{ background: "linear-gradient(135deg, #0f2d57 0%, #1d4f91 100%)", padding: "1.25rem 2rem" }}>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300 }}>™</sup>
             </div>
@@ -185,10 +185,10 @@ export default function ScanPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", padding: "2rem 1rem" }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 4, boxShadow: "0 2px 16px rgba(31,78,121,0.10)", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: SOFT_BG, fontFamily: "var(--font-sans)", padding: "2rem 1rem" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", background: WHITE, borderRadius: 12, boxShadow: "0 10px 30px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.06)", overflow: "hidden" }}>
 
-        <div style={{ background: NAVY, padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="hdr" style={{ background: "linear-gradient(135deg, #0f2d57 0%, #1d4f91 100%)", padding: "1.25rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ color: WHITE, fontSize: "1rem", fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Allied<span style={{ fontWeight: 300 }}>Universal</span><sup style={{ fontSize: "0.5rem", fontWeight: 300, marginLeft: 1 }}>™</sup>
@@ -249,7 +249,7 @@ export default function ScanPage() {
             )}
 
             {error && (
-              <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 4, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginTop: "1rem" }}>
+              <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 12, padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#b91c1c", marginTop: "1rem" }}>
                 {error}
               </div>
             )}
@@ -259,7 +259,7 @@ export default function ScanPage() {
             <>
               <SectionBar label="Step 2 — Review and Correct Before Saving" />
               <div style={{ padding: "0.75rem 2rem 0" }}>
-                <div style={{ background: "#fff3cd", border: "1px solid #fcd34d", borderRadius: 4, padding: "0.7rem 1rem", fontSize: "0.8rem", color: "#92400e", marginBottom: "1rem" }}>
+                <div style={{ background: "#fff3cd", border: "1px solid #fcd34d", borderRadius: 12, padding: "0.7rem 1rem", fontSize: "0.8rem", color: "#92400e", marginBottom: "1rem" }}>
                   Check every field before saving. Correct anything the scan got wrong.
                 </div>
 
@@ -286,7 +286,7 @@ export default function ScanPage() {
 
                 <Label>Activity Log</Label>
                 {extracted.activity_log.map((entry, i) => (
-                  <div key={i} style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 4, padding: "0.75rem 1rem", marginBottom: "0.65rem" }}>
+                  <div key={i} style={{ background: SOFT_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.75rem 1rem", marginBottom: "0.65rem" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
                       <span style={{ fontSize: "0.72rem", fontWeight: 700, color: NAVY, textTransform: "uppercase", letterSpacing: "0.05em" }}>Entry {i + 1}</span>
                       {extracted.activity_log.length > 1 && (
@@ -309,7 +309,7 @@ export default function ScanPage() {
                     </div>
                   </div>
                 ))}
-                <button onClick={addActivityRow} style={{ background: "none", border: `1.5px dashed ${NAVY}`, borderRadius: 4, color: NAVY, padding: "0.6rem 1rem", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: "1rem", fontFamily: "inherit" }}>
+                <button onClick={addActivityRow} style={{ background: "none", border: `1.5px dashed ${NAVY}`, borderRadius: 12, color: NAVY, padding: "0.6rem 1rem", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: "1rem", fontFamily: "inherit" }}>
                   + Add Entry
                 </button>
 
@@ -346,7 +346,7 @@ export default function ScanPage() {
 
 function SectionBar({ label }: { label: string }) {
   return (
-    <div style={{ background: DARK, padding: "0.55rem 2rem", color: "#ffffff", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: "1.5rem" }}>
+    <div style={{ margin: "1.75rem 2rem 0", paddingBottom: "0.5rem", borderBottom: `2px solid ${NAVY}`, color: NAVY, fontSize: "1.05rem", fontWeight: 700 }}>
       {label}
     </div>
   );
@@ -354,7 +354,7 @@ function SectionBar({ label }: { label: string }) {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+    <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "#334155", marginBottom: 6 }}>
       {children}
     </div>
   );
@@ -375,7 +375,7 @@ function Field({ label, value, onChange, placeholder, type = "text", required: r
 
 function Row({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", gap: "1rem" }}>
+    <div className="stack-sm" style={{ display: "flex", gap: "1rem" }}>
       {Array.isArray(children) ? children.map((child, i) => <div key={i} style={{ flex: 1 }}>{child}</div>) : <div style={{ flex: 1 }}>{children}</div>}
     </div>
   );
@@ -393,15 +393,15 @@ function CheckboxItem({ label, checked, onChange }: { label: string; checked: bo
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", boxSizing: "border-box", padding: "0.5rem 0.75rem",
-  border: "1px solid #d1d5db", borderRadius: 4, fontSize: "0.88rem",
-  color: TEXT, background: "#fafbfc", outline: "none", fontFamily: "inherit",
+  width: "100%", boxSizing: "border-box", padding: "0.75rem 0.9rem",
+  border: "1px solid #d1d5db", borderRadius: 12, fontSize: "1rem",
+  color: TEXT, background: "#ffffff", outline: "none", fontFamily: "inherit",
 };
 
 function btnStyle(bg: string): React.CSSProperties {
-  return { background: bg, color: "#ffffff", border: "none", borderRadius: 4, padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", width: "100%" };
+  return { background: bg, color: "#ffffff", border: "none", borderRadius: 12, padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", width: "100%" };
 }
 
 function btnOutlineStyle(color: string): React.CSSProperties {
-  return { background: "none", color, border: `1.5px solid ${color}`, borderRadius: 4, padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", width: "100%", textAlign: "center" as const, textDecoration: "none", display: "block", boxSizing: "border-box" };
+  return { background: "none", color, border: `1.5px solid ${color}`, borderRadius: 12, padding: "0.7rem 1.75rem", fontSize: "0.85rem", fontWeight: 700, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", width: "100%", textAlign: "center" as const, textDecoration: "none", display: "block", boxSizing: "border-box" };
 }
